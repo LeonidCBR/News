@@ -10,24 +10,42 @@
 		B823CEEA2C74CF9700B53A1F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B823CEE92C74CF9700B53A1F /* AppDelegate.swift */; };
 		B823CEEC2C74CF9700B53A1F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B823CEEB2C74CF9700B53A1F /* SceneDelegate.swift */; };
 		B823CEEE2C74CF9700B53A1F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B823CEED2C74CF9700B53A1F /* ViewController.swift */; };
-		B823CEF12C74CF9700B53A1F /* Base in Resources */ = {isa = PBXBuildFile; fileRef = B823CEF02C74CF9700B53A1F /* Base */; };
 		B823CEF32C74CF9800B53A1F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B823CEF22C74CF9800B53A1F /* Assets.xcassets */; };
 		B823CEF62C74CF9800B53A1F /* Base in Resources */ = {isa = PBXBuildFile; fileRef = B823CEF52C74CF9800B53A1F /* Base */; };
+		B861E98B2C74D5E2007FC51D /* AutoDocTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B861E98A2C74D5E2007FC51D /* AutoDocTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B861E98C2C74D5E2007FC51D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B823CEDE2C74CF9700B53A1F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B823CEE52C74CF9700B53A1F;
+			remoteInfo = AutoDoc;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		B823CEE62C74CF9700B53A1F /* AutoDoc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoDoc.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B823CEE92C74CF9700B53A1F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B823CEEB2C74CF9700B53A1F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		B823CEED2C74CF9700B53A1F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		B823CEF02C74CF9700B53A1F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B823CEF22C74CF9800B53A1F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B823CEF52C74CF9800B53A1F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B823CEF72C74CF9800B53A1F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B861E9882C74D5E2007FC51D /* AutoDocTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AutoDocTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B861E98A2C74D5E2007FC51D /* AutoDocTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoDocTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		B823CEE32C74CF9700B53A1F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B861E9852C74D5E2007FC51D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -41,6 +59,7 @@
 			isa = PBXGroup;
 			children = (
 				B823CEE82C74CF9700B53A1F /* AutoDoc */,
+				B861E9892C74D5E2007FC51D /* AutoDocTests */,
 				B823CEE72C74CF9700B53A1F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -49,6 +68,7 @@
 			isa = PBXGroup;
 			children = (
 				B823CEE62C74CF9700B53A1F /* AutoDoc.app */,
+				B861E9882C74D5E2007FC51D /* AutoDocTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -59,12 +79,27 @@
 				B823CEE92C74CF9700B53A1F /* AppDelegate.swift */,
 				B823CEEB2C74CF9700B53A1F /* SceneDelegate.swift */,
 				B823CEED2C74CF9700B53A1F /* ViewController.swift */,
-				B823CEEF2C74CF9700B53A1F /* Main.storyboard */,
 				B823CEF22C74CF9800B53A1F /* Assets.xcassets */,
 				B823CEF42C74CF9800B53A1F /* LaunchScreen.storyboard */,
 				B823CEF72C74CF9800B53A1F /* Info.plist */,
 			);
 			path = AutoDoc;
+			sourceTree = "<group>";
+		};
+		B861E9892C74D5E2007FC51D /* AutoDocTests */ = {
+			isa = PBXGroup;
+			children = (
+				B861E9912C74D5F2007FC51D /* Mocks */,
+				B861E98A2C74D5E2007FC51D /* AutoDocTests.swift */,
+			);
+			path = AutoDocTests;
+			sourceTree = "<group>";
+		};
+		B861E9912C74D5F2007FC51D /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Mocks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -87,6 +122,24 @@
 			productReference = B823CEE62C74CF9700B53A1F /* AutoDoc.app */;
 			productType = "com.apple.product-type.application";
 		};
+		B861E9872C74D5E2007FC51D /* AutoDocTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B861E9902C74D5E2007FC51D /* Build configuration list for PBXNativeTarget "AutoDocTests" */;
+			buildPhases = (
+				B861E9842C74D5E2007FC51D /* Sources */,
+				B861E9852C74D5E2007FC51D /* Frameworks */,
+				B861E9862C74D5E2007FC51D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B861E98D2C74D5E2007FC51D /* PBXTargetDependency */,
+			);
+			name = AutoDocTests;
+			productName = AutoDocTests;
+			productReference = B861E9882C74D5E2007FC51D /* AutoDocTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -99,6 +152,10 @@
 				TargetAttributes = {
 					B823CEE52C74CF9700B53A1F = {
 						CreatedOnToolsVersion = 15.4;
+					};
+					B861E9872C74D5E2007FC51D = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = B823CEE52C74CF9700B53A1F;
 					};
 				};
 			};
@@ -116,6 +173,7 @@
 			projectRoot = "";
 			targets = (
 				B823CEE52C74CF9700B53A1F /* AutoDoc */,
+				B861E9872C74D5E2007FC51D /* AutoDocTests */,
 			);
 		};
 /* End PBXProject section */
@@ -127,7 +185,13 @@
 			files = (
 				B823CEF32C74CF9800B53A1F /* Assets.xcassets in Resources */,
 				B823CEF62C74CF9800B53A1F /* Base in Resources */,
-				B823CEF12C74CF9700B53A1F /* Base in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B861E9862C74D5E2007FC51D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,17 +208,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B861E9842C74D5E2007FC51D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B861E98B2C74D5E2007FC51D /* AutoDocTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXVariantGroup section */
-		B823CEEF2C74CF9700B53A1F /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				B823CEF02C74CF9700B53A1F /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
+/* Begin PBXTargetDependency section */
+		B861E98D2C74D5E2007FC51D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B823CEE52C74CF9700B53A1F /* AutoDoc */;
+			targetProxy = B861E98C2C74D5E2007FC51D /* PBXContainerItemProxy */;
 		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
 		B823CEF42C74CF9800B53A1F /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -297,7 +369,7 @@
 				INFOPLIST_FILE = AutoDoc/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIMainStoryboardFile = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -307,6 +379,10 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.motodolphin.AutoDoc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -325,7 +401,7 @@
 				INFOPLIST_FILE = AutoDoc/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIMainStoryboardFile = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -335,9 +411,57 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.motodolphin.AutoDoc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B861E98E2C74D5E2007FC51D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TZ76M4XXC9;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.motodolphin.AutoDocTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AutoDoc.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AutoDoc";
+			};
+			name = Debug;
+		};
+		B861E98F2C74D5E2007FC51D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TZ76M4XXC9;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.motodolphin.AutoDocTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AutoDoc.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AutoDoc";
 			};
 			name = Release;
 		};
@@ -358,6 +482,15 @@
 			buildConfigurations = (
 				B823CEFB2C74CF9800B53A1F /* Debug */,
 				B823CEFC2C74CF9800B53A1F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B861E9902C74D5E2007FC51D /* Build configuration list for PBXNativeTarget "AutoDocTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B861E98E2C74D5E2007FC51D /* Debug */,
+				B861E98F2C74D5E2007FC51D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
