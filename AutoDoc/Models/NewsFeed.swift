@@ -8,6 +8,7 @@
 import Foundation
 
 struct NewsFeed: Decodable {
-    let news: [News]
+    static let url = URL(string: "https://webapi.autodoc.ru/api/news/1/15")!
+    let news: [NewsItem]
     let totalCount: UInt
 }

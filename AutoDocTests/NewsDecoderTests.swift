@@ -34,6 +34,15 @@ final class NewsDecoderTests: XCTestCase {
         let item = news[3]
         XCTAssertEqual(item.id, 8142)
         XCTAssertEqual(item.title, "Acura подтвердила электрического преемника NSX")
+        XCTAssertEqual(item.description, "Производство NSX от Acura завершилось в 2022 году")
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = .gmt
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        let testDate = dateFormatter.date(from: "2024-08-19T00:00:00")!
+        XCTAssertEqual(item.publishedDate, testDate)
+        XCTAssertEqual(item.fullUrl, "https://www.autodoc.ru/avto-novosti/acura_nsx_electro")
+        XCTAssertEqual(item.titleImageUrl, "https://file.autodoc.ru/news/avto-novosti/262706931_1.jpg")
+        XCTAssertEqual(item.categoryType, "Автомобильные новости")
     }
 
     func testPerformanceExample() throws {
