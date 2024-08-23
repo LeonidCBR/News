@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct NewsItem: Decodable {
+struct NewsItem: Decodable, Hashable {
     let id: UInt
     let title: String
     let description: String
@@ -48,5 +48,21 @@ struct NewsItem: Decodable {
         } else {
             throw NewsError.wrongPublishedDate(publishedDateString)
         }
+    }
+
+    init(id: UInt,
+         title: String,
+         description: String,
+         publishedDate: Date,
+         fullUrl: String,
+         titleImageUrl: String,
+         categoryType: String) {
+        self.id = id
+        self.title = title
+        self.description = description
+        self.publishedDate = publishedDate
+        self.fullUrl = fullUrl
+        self.titleImageUrl = titleImageUrl
+        self.categoryType = categoryType
     }
 }

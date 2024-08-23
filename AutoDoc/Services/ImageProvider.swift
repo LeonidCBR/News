@@ -8,6 +8,7 @@
 import UIKit
 
 /// A service provides images
+@MainActor
 final class ImageProvider {
     // MARK: - Properties
 

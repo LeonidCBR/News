@@ -6,16 +6,40 @@
 //
 
 import UIKit
+import Combine
 
 @MainActor
 class NewsController: UIViewController {
-    let newsViewModel: NewsViewModel
-    let newsCellIdentifier = "NewsCellIdentifier"
+    enum Section {
+        case main
+    }
 
-    let newsCollection: UICollectionView = {
-        // TODO: Implement CompositionalLayout
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
+    let newsViewModel: NewsViewModel
+    var subscription: AnyCancellable!
+    
+    // TODO: use NewsItem or NewsItem.id???
+    var dataSource: UICollectionViewDiffableDataSource<Section, NewsItem>! = nil
+//    var dataSource: UICollectionViewDiffableDataSource<Section, UInt>! = nil
+
+    var mainLayout: UICollectionViewLayout {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                             heightDimension: .fractionalHeight(1.0))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                              heightDimension: .absolute(250))
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+        let spacing = CGFloat(10)
+        group.interItemSpacing = .fixed(spacing)
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = spacing
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
+        let layout = UICollectionViewCompositionalLayout(section: section)
+        return layout
+    }
+
+    lazy var newsCollection: UICollectionView = {
+        let collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: mainLayout)
+        collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         return collectionView
     }()
 
@@ -31,39 +55,154 @@ class NewsController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        configureDataSource()
         fetchNews()
+        deal()
     }
 
     private func configureUI() {
         view.backgroundColor = .white
         view.addSubview(newsCollection)
-        NSLayoutConstraint.activate([
-            newsCollection.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8.0),
-            newsCollection.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            view.safeAreaLayoutGuide.trailingAnchor.constraint(equalTo: newsCollection.trailingAnchor, constant: 8.0),
-            view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: newsCollection.bottomAnchor)
-        ])
-        newsCollection.delegate = self
-        newsCollection.dataSource = self
-        newsCollection.register(NewsItemCell.self, forCellWithReuseIdentifier: newsCellIdentifier)
-        // TODO: Delete
         newsCollection.backgroundColor = .cyan
+//        newsCollection.delegate = self
+//        newsCollection.dataSource = self
+//        newsCollection.register(NewsItemCell.self, forCellWithReuseIdentifier: newsCellIdentifier)
     }
 
-    private func fetchNews() {
-        Task { [weak self] in
-            do {
-                guard let self else { return }
-                try await self.newsViewModel.fetchNews()
-                self.newsCollection.reloadData()
-            } catch {
-                print("DEBUG: Error while fetching news: \(error.localizedDescription)")
-            }
+    func configureDataSource() {
+        let cellRegistration = UICollectionView.CellRegistration<NewsItemCell, NewsItem> { (cell, indexPath, newsItem) in
+            // Populate the cell with our item description.
+//            cell.label.text = "\(identifier)"
+            cell.titleLabel.text = newsItem.title
+            // TODO: Set image
+//            cell.titleImageView.image
+            cell.contentView.backgroundColor = .systemGray5
+//            cell.layer.borderColor = UIColor.black.cgColor
+//            cell.layer.borderWidth = 1
         }
+
+//        dataSource = UICollectionViewDiffableDataSource<Section, NewsItem>(collectionView: newsCollection) {
+//            (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItem) -> UICollectionViewCell? in
+//            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: identifier)
+//        }
+        dataSource = UICollectionViewDiffableDataSource(collectionView: newsCollection) { [weak self]
+            collectionView, indexPath, newsItem -> UICollectionViewCell? in
+//            collectionView, indexPath, identifier -> UICollectionViewCell? in
+//            guard let newsItem = self?.newsViewModel.getNewsItem(with: identifier) else { return nil }
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: newsItem)
+        }
+        /**
+         // Create the diffable data source and its cell provider.
+         recipeListDataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) {
+             collectionView, indexPath, identifier -> UICollectionViewCell in
+             // `identifier` is an instance of `Recipe.ID`. Use it to
+             // retrieve the recipe from the backing data store.
+             let recipe = dataStore.recipe(with: identifier)!
+             return collectionView.dequeueConfiguredReusableCell(using: recipeCellRegistration, for: indexPath, item: recipe)
+         }
+         */
+/*
+        // TODO: Get rid of the initial data
+        var snapshot = NSDiffableDataSourceSnapshot<Section, UInt>()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(newsViewModel.getNewsIDs())
+        dataSource.apply(snapshot, animatingDifferences: false)
+        */
+    }
+    
+    func updateData(news: [NewsItem]) {
+//        var snapshot = NSDiffableDataSourceSnapshot<Section, UInt>()
+        var snapshot = NSDiffableDataSourceSnapshot<Section, NewsItem>()
+        snapshot.appendSections([.main])
+//        snapshot.appendItems(newsViewModel.getNewsIDs())
+        snapshot.appendItems(news)
+        dataSource.apply(snapshot, animatingDifferences: false)
+//            var snapshot = Snapshot()
+//            snapshot.appendSections([.main])
+//            snapshot.appendItems(cards)
+//            dataSource.apply(snapshot, animatingDifferences: true)
+    }
+    
+    func deal() {
+        print("DEBUG: \(#function)")
+        let publisher = newsViewModel.getNewsPublisher()
+        subscription = publisher
+            .sink(receiveCompletion: { completion in
+                if case .failure(let err) = completion {
+                    print("Retrieving data failed with error \(err)")
+                }
+            }, receiveValue: { newsFeed in
+                self.updateData(news: newsFeed.news)
+            })
+    }
+    /*
+    func deal() {
+        let publisher = (hand.cards.isEmpty) ? DealerService.dealFromNewDeck() : DealerService.dealFromDeck(with: hand.deck_id!)
+        subscription = publisher
+            .sink(receiveCompletion: { completion in
+                if case .failure(let err) = completion {
+                    print("Retrieving data failed with error \(err)")
+                }
+            }, receiveValue: { object in
+                self.hand.deck_id = object.deck_id
+                self.hand.cards.append(object.cards!.first!)
+                self.updateHand(cards: self.hand.cards)
+                self.updateTitles(cardsRemaining: object.remaining)
+            })
+    }
+    */
+
+    private func fetchNews() {
+        print("DEBUG: \(#function) - Implement with combine")
+        // TODO: Implement with combine
+//        Task { [weak self] in
+//            do {
+//                guard let self else { return }
+//                try await self.newsViewModel.fetchNews()
+//                self.newsCollection.reloadData()
+//            } catch {
+//                print("DEBUG: Error while fetching news: \(error.localizedDescription)")
+//            }
+//        }
     }
 
 }
+/*
+extension NewsController {
+    func createLayout() -> UICollectionViewLayout {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                             heightDimension: .fractionalHeight(1.0))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                              heightDimension: .absolute(250)) // 44
+//        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 2)
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+        let spacing = CGFloat(10)
+        group.interItemSpacing = .fixed(spacing)
+
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = spacing
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
+
+        let layout = UICollectionViewCompositionalLayout(section: section)
+        return layout
+        /**
+         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.2),
+                                              heightDimension: .fractionalHeight(1.0))
+         let item = NSCollectionLayoutItem(layoutSize: itemSize)
+         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                               heightDimension: .fractionalWidth(0.2))
+         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
+                                                          subitems: [item])
+         let section = NSCollectionLayoutSection(group: group)
+         let layout = UICollectionViewCompositionalLayout(section: section)
+         return layout
+         */
+    }
+}
+*/
+/*
 extension NewsController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         newsViewModel.news.count
@@ -112,3 +251,4 @@ extension NewsController: UICollectionViewDelegate, UICollectionViewDataSource, 
         return CGSize(width: 300.0, height: 250.0)
     }
 }
+*/

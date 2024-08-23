@@ -22,3 +22,7 @@ struct NewsDecoder {
     }
 
 }
+// TODO: Should I use?
+class MyNewsDecoder: JSONDecoder {
+
+}
