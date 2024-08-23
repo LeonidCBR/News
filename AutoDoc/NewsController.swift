@@ -15,7 +15,7 @@ class NewsController: UIViewController {
     }
 
     let newsViewModel: NewsViewModel
-    var subscription: AnyCancellable!
+    var subscription: AnyCancellable?
     
     // TODO: use NewsItem or NewsItem.id???
     var dataSource: UICollectionViewDiffableDataSource<Section, NewsItem>! = nil
@@ -53,14 +53,16 @@ class NewsController: UIViewController {
     }
 
     override func viewDidLoad() {
+        print("DEBUG: \(#function)")
         super.viewDidLoad()
         configureUI()
         configureDataSource()
-        fetchNews()
-        deal()
+        createSubscription()
+        downloadNews()
     }
 
     private func configureUI() {
+        print("DEBUG: \(#function)")
         view.backgroundColor = .white
         view.addSubview(newsCollection)
         newsCollection.backgroundColor = .cyan
@@ -70,6 +72,7 @@ class NewsController: UIViewController {
     }
 
     func configureDataSource() {
+        print("DEBUG: \(#function)")
         let cellRegistration = UICollectionView.CellRegistration<NewsItemCell, NewsItem> { (cell, indexPath, newsItem) in
             // Populate the cell with our item description.
 //            cell.label.text = "\(identifier)"
@@ -111,6 +114,7 @@ class NewsController: UIViewController {
     }
     
     func updateData(news: [NewsItem]) {
+        print("DEBUG: \(#function)")
 //        var snapshot = NSDiffableDataSourceSnapshot<Section, UInt>()
         var snapshot = NSDiffableDataSourceSnapshot<Section, NewsItem>()
         snapshot.appendSections([.main])
@@ -123,16 +127,25 @@ class NewsController: UIViewController {
 //            dataSource.apply(snapshot, animatingDifferences: true)
     }
     
-    func deal() {
+    func createSubscription() {
         print("DEBUG: \(#function)")
-        let publisher = newsViewModel.getNewsPublisher()
-        subscription = publisher
+//        let publisher = newsViewModel.getNewsPublisher()
+//        subscription = publisher
+//            .sink(receiveCompletion: { completion in
+//                if case .failure(let err) = completion {
+//                    print("DEBUG: Retrieving data failed with error \(err)")
+//                }
+//            }, receiveValue: { newsFeed in
+//                self.updateData(news: newsFeed.news)
+//            })
+
+        subscription = newsViewModel.$news
             .sink(receiveCompletion: { completion in
                 if case .failure(let err) = completion {
-                    print("Retrieving data failed with error \(err)")
+                    print("DEBUG: Retrieving data failed with error \(err)")
                 }
-            }, receiveValue: { newsFeed in
-                self.updateData(news: newsFeed.news)
+            }, receiveValue: { news in
+                self.updateData(news: news)
             })
     }
     /*
@@ -152,8 +165,8 @@ class NewsController: UIViewController {
     }
     */
 
-    private func fetchNews() {
-        print("DEBUG: \(#function) - Implement with combine")
+//    private func fetchNews() {
+//        print("DEBUG: \(#function) - Implement with combine")
         // TODO: Implement with combine
 //        Task { [weak self] in
 //            do {
@@ -164,6 +177,16 @@ class NewsController: UIViewController {
 //                print("DEBUG: Error while fetching news: \(error.localizedDescription)")
 //            }
 //        }
+//    }
+    private func downloadNews() {
+        print("DEBUG: \(#function)")
+        Task { [weak self] in
+            do {
+                try await self?.newsViewModel.downloadNews()
+            } catch {
+                print("DEBUG: Error while fetching news: \(error.localizedDescription)")
+            }
+        }
     }
 
 }

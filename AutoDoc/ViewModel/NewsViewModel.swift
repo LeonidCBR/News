@@ -17,13 +17,16 @@ struct NewsPublisher: Publisher {
     }
 }
 */
+
+@MainActor
 final class NewsViewModel {
     private let networkProvider: NetworkProvider
     private let imageProvider: ImageProvider
 
 //    let newsPublisher = Publisher<NewsItem, Error>()
     // TODO: Implement downloading from API
-    private(set) var news: [NewsItem] = []
+//    @Published private(set) var items: [TodoItem]
+    @Published private(set) var news: [NewsItem] = []
 //    private(set) var news: [NewsItem] = [
 //        NewsItem(id: 8144,
 //                 title: "GMC Yukon 2025 с новым дизельным мотором",
@@ -54,12 +57,12 @@ final class NewsViewModel {
         self.imageProvider = imageProvider
     }
 
-    func fetchNews() async throws {
-        print("DEBUG: \(#function)")
-        let newsData = try await self.networkProvider.downloadData(withUrl: NewsFeed.url)
-        let newsDecoder = try NewsDecoder(with: newsData)
-        news = newsDecoder.newsFeed.news
-    }
+//    func fetchNews() async throws {
+//        print("DEBUG: \(#function)")
+//        let newsData = try await self.networkProvider.downloadData(withUrl: NewsFeed.url)
+//        let newsDecoder = try NewsDecoder(with: newsData)
+//        news = newsDecoder.newsFeed.news
+//    }
     /*
     func getNewsPublisher() -> AnyPublisher<NewsItem, Error> {
         AnyPublisher { subscriber in
@@ -80,14 +83,23 @@ final class NewsViewModel {
         }
     }
     */
-    func getNewsPublisher() -> AnyPublisher<NewsFeed, Error> {
-        print("DEBUG: \(#function)")
-        return URLSession.shared.dataTaskPublisher(for: NewsFeed.url)
-            .mapError { $0 as Error }
-            .map(\.data)
-            .decode(type: NewsFeed.self, decoder: JSONDecoder())
-            .eraseToAnyPublisher()
+//    func getNewsPublisher() -> AnyPublisher<NewsFeed, Error> {
+//        print("DEBUG: \(#function)")
+//        return URLSession.shared.dataTaskPublisher(for: NewsFeed.url)
+//            .mapError { $0 as Error }
+//            .map(\.data)
+//            .decode(type: NewsFeed.self, decoder: JSONDecoder())
+//            .eraseToAnyPublisher()
+//    }
+    
+    // TODO: implement fetching
+    func downloadNews() async throws {
+        let newsData = try await self.networkProvider.downloadData(withUrl: NewsFeed.url)
+        let newsDecoder = try NewsDecoder(with: newsData)
+        news = newsDecoder.newsFeed.news
     }
+    
+    
     /*
     static func dealFromDeck(with id: String) -> AnyPublisher<Deal, Error> {
         let url = URL(string: "https://deckofcardsapi.com/api/deck/\(id)/draw/?count=1")!
@@ -114,6 +126,7 @@ final class NewsViewModel {
      }
      */
 
+    // TODO: Check
     func getImage(for itemId: Int) async throws -> UIImage {
         print("DEBUG: \(#function)")
         let image = try await imageProvider.fetchImage(withPath: news[itemId].titleImageUrl)
