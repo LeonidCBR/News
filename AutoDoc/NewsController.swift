@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import SafariServices
 
 @MainActor
 class NewsController: UIViewController {
@@ -66,7 +67,7 @@ class NewsController: UIViewController {
         view.backgroundColor = .white
         view.addSubview(newsCollection)
         newsCollection.backgroundColor = .cyan
-//        newsCollection.delegate = self
+        newsCollection.delegate = self
 //        newsCollection.dataSource = self
 //        newsCollection.register(NewsItemCell.self, forCellWithReuseIdentifier: newsCellIdentifier)
     }
@@ -225,6 +226,32 @@ extension NewsController {
     }
 }
 */
+extension NewsController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let newsItem = dataSource.itemIdentifier(for: indexPath) else { return }
+        guard let newsUrl = URL(string: newsItem.fullUrl) else { return }
+        let newsVC = SFSafariViewController(url: newsUrl)
+        present(newsVC, animated: true)
+//        let newsItemId = indexPath.item
+//        print("DEBUG: Selected item \(newsItemId)")
+//        let newsVC = UIViewController()
+//        let webView = UIWebView()
+//        webView.translatesAutoresizingMaskIntoConstraints = false
+//        newsVC.view.addSubview(webView)
+//        NSLayoutConstraint.activate([
+//            webView.leadingAnchor.constraint(equalTo: newsVC.view.leadingAnchor),
+//            webView.trailingAnchor.constraint(equalTo: newsVC.view.trailingAnchor),
+//            webView.topAnchor.constraint(equalTo: newsVC.view.topAnchor),
+//            webView.bottomAnchor.constraint(equalTo: newsVC.view.bottomAnchor)
+//        ])
+//        if let fullUrl = URL(string: newsViewModel.news[newsItemId].fullUrl) {
+//            webView.loadRequest(URLRequest(url: fullUrl))
+//            present(newsVC, animated: true)
+//        } else {
+//            fatalError("Cannot get url!")
+//        }
+    }
+}
 /*
 extension NewsController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
