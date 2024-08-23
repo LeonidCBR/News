@@ -101,10 +101,10 @@
 				B861E9972C74DA20007FC51D /* Models */,
 				B84494212C76351000A5698B /* Views */,
 				B844941E2C762FC500A5698B /* ViewModel */,
+				B84BF3A32C791F9F003BC929 /* Controllers */,
 				B861E9942C74D923007FC51D /* Services */,
 				B823CEE92C74CF9700B53A1F /* AppDelegate.swift */,
 				B823CEEB2C74CF9700B53A1F /* SceneDelegate.swift */,
-				B823CEED2C74CF9700B53A1F /* NewsController.swift */,
 				B823CEF22C74CF9800B53A1F /* Assets.xcassets */,
 				B823CEF42C74CF9800B53A1F /* LaunchScreen.storyboard */,
 				B823CEF72C74CF9800B53A1F /* Info.plist */,
@@ -126,6 +126,14 @@
 				B84494222C76353100A5698B /* NewsItemCell.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		B84BF3A32C791F9F003BC929 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				B823CEED2C74CF9700B53A1F /* NewsController.swift */,
+			);
+			path = Controllers;
 			sourceTree = "<group>";
 		};
 		B861E9892C74D5E2007FC51D /* AutoDocTests */ = {

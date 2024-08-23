@@ -19,7 +19,7 @@ final class NewsViewModelTests: XCTestCase {
         sut = nil
     }
 
-    func testNewsDecoder_WhenValidDataWasProvided_ReturnNews() async throws {
+    func testNewsViewModel_WhenValidDataWasProvided_ReturnNews() async throws {
         let bundle = Bundle(for: NewsViewModelTests.self)
         let jsonURL = bundle.url(forResource: "data",
                                  withExtension: "json")!
