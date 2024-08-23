@@ -186,7 +186,7 @@ class NewsController: UIViewController {
         print("DEBUG: \(#function)")
         Task { [weak self] in
             do {
-                try await self?.newsViewModel.downloadNews()
+                try await self?.newsViewModel.fetchNews()
             } catch {
                 print("DEBUG: Error while fetching news: \(error.localizedDescription)")
             }

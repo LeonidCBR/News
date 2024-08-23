@@ -1,5 +1,5 @@
 //
-//  NewsDecoderTests.swift
+//  NewsViewModelTests.swift
 //  AutoDocTests
 //
 //  Created by Dolphin on 20.08.2024.
@@ -8,24 +8,23 @@
 import XCTest
 @testable import AutoDoc
 
-final class NewsDecoderTests: XCTestCase {
+final class NewsViewModelTests: XCTestCase {
+    var sut: NewsViewModel!
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    @MainActor override func setUpWithError() throws {
+        sut = NewsViewModel()
     }
 
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        sut = nil
     }
 
-    func testNewsDecoder_WhenValidDataWasProvided_ReturnNews() throws {
-        let bundle = Bundle(for: NewsDecoderTests.self)
+    func testNewsDecoder_WhenValidDataWasProvided_ReturnNews() async throws {
+        let bundle = Bundle(for: NewsViewModelTests.self)
         let jsonURL = bundle.url(forResource: "data",
                                  withExtension: "json")!
         let jsonData = try Data(contentsOf: jsonURL)
-        let newsDecoder = try NewsDecoder(with: jsonData)
-        XCTAssertEqual(newsDecoder.newsFeed.totalCount, 991)
-        let news = newsDecoder.newsFeed.news
+        let news = try await sut.decodeNewsData(jsonData)
         let countNews = 15
         guard news.count == countNews else {
             XCTFail("It has been got \(news.count) news instead of \(countNews)")
@@ -43,18 +42,6 @@ final class NewsDecoderTests: XCTestCase {
         XCTAssertEqual(item.fullUrl, "https://www.autodoc.ru/avto-novosti/acura_nsx_electro")
         XCTAssertEqual(item.titleImageUrl, "https://file.autodoc.ru/news/avto-novosti/262706931_1.jpg")
         XCTAssertEqual(item.categoryType, "Автомобильные новости")
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            let bundle = Bundle(for: NewsDecoderTests.self)
-            let jsonURL = bundle.url(forResource: "data", withExtension: "json")!
-            if let newsData = try? Data(contentsOf: jsonURL),
-               let newsDecoder = try? NewsDecoder(with: newsData) {
-                _ = newsDecoder.newsFeed
-            }
-        }
     }
 
 }

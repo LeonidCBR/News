@@ -52,7 +52,7 @@ final class NewsViewModel {
     }
     */
 
-    init(networkProvider: NetworkProvider) {
+    init(networkProvider: NetworkProvider = NetworkProvider()) {
         self.networkProvider = networkProvider
     }
 
@@ -90,14 +90,25 @@ final class NewsViewModel {
 //            .decode(type: NewsFeed.self, decoder: JSONDecoder())
 //            .eraseToAnyPublisher()
 //    }
-    
-    // TODO: implement fetching
-    func downloadNews() async throws {
+
+    func fetchNews() async throws {
         let newsData = try await self.networkProvider.downloadData(withUrl: NewsFeed.url)
-        let newsDecoder = try NewsDecoder(with: newsData)
-        news = newsDecoder.newsFeed.news
+//        let newsDecoder = try NewsDecoder(with: newsData)
+//        news = newsDecoder.newsFeed.news
+        news = try decodeNewsData(newsData)
     }
-    
+
+    func decodeNewsData(_ newsData: Data) throws -> [NewsItem] {
+        do {
+            let jsonDecoder = JSONDecoder()
+            jsonDecoder.dateDecodingStrategy = .secondsSince1970
+            let newsFeed = try jsonDecoder.decode(NewsFeed.self, from: newsData)
+            return newsFeed.news
+        } catch {
+            throw NewsError.wrongDataFormat(error: error)
+        }
+    }
+
     func getImage(for newsItem: NewsItem) async throws -> UIImage {
         print("new func getting image")
 //        let image = try await fetchImage(withPath: newsItem.titleImageUrl)
