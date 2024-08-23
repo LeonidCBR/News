@@ -19,8 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
         let networkProvider = NetworkProvider()
-        let imageProvider = ImageProvider(with: networkProvider)
-        let newsViewModel = NewsViewModel(networkProvider: networkProvider, imageProvider: imageProvider)
+        let newsViewModel = NewsViewModel(networkProvider: networkProvider)
         window.rootViewController = NewsController(with: newsViewModel)
         window.makeKeyAndVisible()
         self.window = window

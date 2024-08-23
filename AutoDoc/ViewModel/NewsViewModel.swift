@@ -21,8 +21,8 @@ struct NewsPublisher: Publisher {
 @MainActor
 final class NewsViewModel {
     private let networkProvider: NetworkProvider
-    private let imageProvider: ImageProvider
-
+    private let cacheImages = NSCache<NSString, UIImage>()
+    
 //    let newsPublisher = Publisher<NewsItem, Error>()
     // TODO: Implement downloading from API
 //    @Published private(set) var items: [TodoItem]
@@ -52,9 +52,8 @@ final class NewsViewModel {
     }
     */
 
-    init(networkProvider: NetworkProvider, imageProvider: ImageProvider) {
+    init(networkProvider: NetworkProvider) {
         self.networkProvider = networkProvider
-        self.imageProvider = imageProvider
     }
 
 //    func fetchNews() async throws {
@@ -100,9 +99,48 @@ final class NewsViewModel {
     }
     
     func getImage(for newsItem: NewsItem) async throws -> UIImage {
-        let image = try await imageProvider.fetchImage(withPath: newsItem.titleImageUrl)
-        return image
+        print("new func getting image")
+//        let image = try await fetchImage(withPath: newsItem.titleImageUrl)
+        // Check if image exists in cache
+        let imagePath = newsItem.titleImageUrl
+        if let cachedImage = cacheImages.object(forKey: imagePath as NSString) {
+            return cachedImage
+        }
+        // Check image path
+        guard let imageUrl = URL(string: imagePath) else {
+            throw NetworkError.unexpectedURL
+        }
+        // Download image
+        let imageData = try await networkProvider.downloadData(withUrl: imageUrl)
+        if let image = UIImage(data: imageData) {
+            // Add image to cache
+            cacheImages.setObject(image, forKey: imagePath as NSString)
+            return image
+        } else {
+            throw NetworkError.unexpectedData
+        }
+//        return image
     }
+//    private func fetchImage(withPath imagePath: String) async throws -> UIImage {
+//        // Check if image exists in cache
+//        if let cachedImage = cacheImages.object(forKey: imagePath as NSString) {
+//            return cachedImage
+//        }
+//        // Check image path
+//        guard let imageUrl = URL(string: imagePath) else {
+//            throw NetworkError.unexpectedURL
+//        }
+//        // Download image
+//        let imageData = try await networkProvider.downloadData(withUrl: imageUrl)
+//        if let image = UIImage(data: imageData) {
+//            // Add image to cache
+//            cacheImages.setObject(image, forKey: imagePath as NSString)
+//            return image
+//        } else {
+//            throw NetworkError.unexpectedData
+//        }
+//    }
+    
     /*
     static func dealFromDeck(with id: String) -> AnyPublisher<Deal, Error> {
         let url = URL(string: "https://deckofcardsapi.com/api/deck/\(id)/draw/?count=1")!
@@ -146,5 +184,6 @@ final class NewsViewModel {
 //        print("DEBUG: \(#function)")
 //        return news.first(where: { $0.id == identifier })
 //    }
+    
 
 }
