@@ -99,7 +99,10 @@ final class NewsViewModel {
         news = newsDecoder.newsFeed.news
     }
     
-    
+    func getImage(for newsItem: NewsItem) async throws -> UIImage {
+        let image = try await imageProvider.fetchImage(withPath: newsItem.titleImageUrl)
+        return image
+    }
     /*
     static func dealFromDeck(with id: String) -> AnyPublisher<Deal, Error> {
         let url = URL(string: "https://deckofcardsapi.com/api/deck/\(id)/draw/?count=1")!
@@ -127,11 +130,11 @@ final class NewsViewModel {
      */
 
     // TODO: Check
-    func getImage(for itemId: Int) async throws -> UIImage {
-        print("DEBUG: \(#function)")
-        let image = try await imageProvider.fetchImage(withPath: news[itemId].titleImageUrl)
-        return image
-    }
+//    func getImage(for itemId: Int) async throws -> UIImage {
+//        print("DEBUG: \(#function)")
+//        let image = try await imageProvider.fetchImage(withPath: news[itemId].titleImageUrl)
+//        return image
+//    }
     
     // It works
 //    func getNewsIDs() -> [UInt] {

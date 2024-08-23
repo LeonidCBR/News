@@ -79,7 +79,10 @@ class NewsController: UIViewController {
 //            cell.label.text = "\(identifier)"
             cell.titleLabel.text = newsItem.title
             // TODO: Set image
-//            cell.titleImageView.image
+//            cell.titleImageView.image = try? await self.newsViewModel.getImage(for: indexPath.item)
+            Task { [weak self] in
+                cell.titleImageView.image = try await self?.newsViewModel.getImage(for: newsItem)
+            }
             cell.contentView.backgroundColor = .systemGray5
 //            cell.layer.borderColor = UIColor.black.cgColor
 //            cell.layer.borderWidth = 1
@@ -232,24 +235,6 @@ extension NewsController: UICollectionViewDelegate {
         guard let newsUrl = URL(string: newsItem.fullUrl) else { return }
         let newsVC = SFSafariViewController(url: newsUrl)
         present(newsVC, animated: true)
-//        let newsItemId = indexPath.item
-//        print("DEBUG: Selected item \(newsItemId)")
-//        let newsVC = UIViewController()
-//        let webView = UIWebView()
-//        webView.translatesAutoresizingMaskIntoConstraints = false
-//        newsVC.view.addSubview(webView)
-//        NSLayoutConstraint.activate([
-//            webView.leadingAnchor.constraint(equalTo: newsVC.view.leadingAnchor),
-//            webView.trailingAnchor.constraint(equalTo: newsVC.view.trailingAnchor),
-//            webView.topAnchor.constraint(equalTo: newsVC.view.topAnchor),
-//            webView.bottomAnchor.constraint(equalTo: newsVC.view.bottomAnchor)
-//        ])
-//        if let fullUrl = URL(string: newsViewModel.news[newsItemId].fullUrl) {
-//            webView.loadRequest(URLRequest(url: fullUrl))
-//            present(newsVC, animated: true)
-//        } else {
-//            fatalError("Cannot get url!")
-//        }
     }
 }
 /*
