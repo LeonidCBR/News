@@ -10,17 +10,14 @@ import Foundation
 /// A service provides network
 final class NetworkProvider {
     // MARK: - Properties
-
     private let urlSession: URLSession
 
-    // MARK: - Lifecycle
-
+    // MARK: - Life Cycles
     init(urlSession: URLSession = .shared) {
         self.urlSession = urlSession
     }
 
-    // MARK: - Methods
-
+    // MARK: - Functions
     func downloadData(withUrl url: URL) async throws -> Data {
         let request = URLRequest(url: url)
         let data = try await downloadData(with: request)

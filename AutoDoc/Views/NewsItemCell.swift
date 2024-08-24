@@ -8,6 +8,7 @@
 import UIKit
 
 class NewsItemCell: UICollectionViewCell {
+    // MARK: - Properties
     static let reuseIdentifier = "NewsCellReuseIdentifier"
 
     let titleLabel: UILabel = {
@@ -40,6 +41,7 @@ class NewsItemCell: UICollectionViewCell {
         return view
     }()
 
+    // MARK: - Life Cycles
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureUI()
@@ -49,6 +51,7 @@ class NewsItemCell: UICollectionViewCell {
         return nil
     }
 
+    // MARK: - Functions
     private func configureUI() {
         contentView.addSubview(shadowView)
         contentView.addSubview(imageView)
