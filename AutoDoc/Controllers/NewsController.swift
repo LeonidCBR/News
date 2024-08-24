@@ -10,16 +10,20 @@ import Combine
 import SafariServices
 
 @MainActor
-class NewsController: UIViewController {
+class NewsController: UICollectionViewController {
+    typealias DataSource = UICollectionViewDiffableDataSource<Section, NewsItem>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, NewsItem>
+
     enum Section {
         case main
     }
 
     let newsViewModel: NewsViewModel
     var subscription: AnyCancellable?
-    
+
     // TODO: use NewsItem or NewsItem.id???
-    var dataSource: UICollectionViewDiffableDataSource<Section, NewsItem>! = nil
+    private lazy var dataSource: DataSource = makeDataSource()
+//    var dataSource: UICollectionViewDiffableDataSource<Section, NewsItem>! = nil
 //    var dataSource: UICollectionViewDiffableDataSource<Section, UInt>! = nil
 
     var mainLayout: UICollectionViewLayout {
@@ -38,15 +42,15 @@ class NewsController: UIViewController {
         return layout
     }
 
-    lazy var newsCollection: UICollectionView = {
-        let collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: mainLayout)
-        collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        return collectionView
-    }()
+//    lazy var newsCollection: UICollectionView = {
+//        let collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: mainLayout)
+//        collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+//        return collectionView
+//    }()
 
     init(with viewModel: NewsViewModel) {
         newsViewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
+        super.init(collectionViewLayout: NewsController.makeLayout())
     }
 
     required init?(coder: NSCoder) {
@@ -54,48 +58,31 @@ class NewsController: UIViewController {
     }
 
     override func viewDidLoad() {
-        print("DEBUG: \(#function)")
         super.viewDidLoad()
         configureUI()
-        configureDataSource()
+//        configureDataSource()
         createSubscription()
         downloadNews()
     }
 
     private func configureUI() {
-        print("DEBUG: \(#function)")
+        title = "Новости"
         view.backgroundColor = .white
-        view.addSubview(newsCollection)
-        newsCollection.backgroundColor = .cyan
-        newsCollection.delegate = self
-//        newsCollection.dataSource = self
-//        newsCollection.register(NewsItemCell.self, forCellWithReuseIdentifier: newsCellIdentifier)
+//        view.addSubview(newsCollection)
+//        newsCollection.delegate = self
     }
 
-    func configureDataSource() {
-        print("DEBUG: \(#function)")
+    func makeDataSource() -> DataSource {
         let cellRegistration = UICollectionView.CellRegistration<NewsItemCell, NewsItem> { (cell, indexPath, newsItem) in
-            // Populate the cell with our item description.
-//            cell.label.text = "\(identifier)"
             cell.titleLabel.text = newsItem.title
-            // TODO: Set image
-//            cell.titleImageView.image = try? await self.newsViewModel.getImage(for: indexPath.item)
             Task { [weak self] in
-                cell.titleImageView.image = try await self?.newsViewModel.getImage(for: newsItem)
+                cell.imageView.image = try await self?.newsViewModel.getImage(for: newsItem)
             }
-            cell.contentView.backgroundColor = .systemGray5
-//            cell.layer.borderColor = UIColor.black.cgColor
-//            cell.layer.borderWidth = 1
-        }
 
-//        dataSource = UICollectionViewDiffableDataSource<Section, NewsItem>(collectionView: newsCollection) {
-//            (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItem) -> UICollectionViewCell? in
-//            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: identifier)
-//        }
-        dataSource = UICollectionViewDiffableDataSource(collectionView: newsCollection) { [weak self]
+        }
+//        dataSource = UICollectionViewDiffableDataSource(collectionView: newsCollection) { [weak self]
+        let dataSource = DataSource(collectionView: collectionView) { [weak self]
             collectionView, indexPath, newsItem -> UICollectionViewCell? in
-//            collectionView, indexPath, identifier -> UICollectionViewCell? in
-//            guard let newsItem = self?.newsViewModel.getNewsItem(with: identifier) else { return nil }
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: newsItem)
         }
         /**
@@ -108,31 +95,66 @@ class NewsController: UIViewController {
              return collectionView.dequeueConfiguredReusableCell(using: recipeCellRegistration, for: indexPath, item: recipe)
          }
          */
-/*
-        // TODO: Get rid of the initial data
-        var snapshot = NSDiffableDataSourceSnapshot<Section, UInt>()
-        snapshot.appendSections([.main])
-        snapshot.appendItems(newsViewModel.getNewsIDs())
-        dataSource.apply(snapshot, animatingDifferences: false)
-        */
+        return dataSource
     }
     
+    
+    // TODO: Implement new layout
+    static func makeLayout() -> UICollectionViewLayout {
+        /*
+        collectionView.register(
+            SectionHeaderReusableView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: SectionHeaderReusableView.reuseIdentifier
+        )
+        */
+//        collectionView.collectionViewLayout = UICollectionViewCompositionalLayout(sectionProvider: { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
+        let compositionalLayout = UICollectionViewCompositionalLayout(sectionProvider: { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
+            let isPhone = layoutEnvironment.traitCollection.userInterfaceIdiom == UIUserInterfaceIdiom.phone
+            let size = NSCollectionLayoutSize(
+                widthDimension: NSCollectionLayoutDimension.fractionalWidth(1),
+//                widthDimension: NSCollectionLayoutDimension.fractionalWidth(isPhone ? 1 : 0.5),
+                heightDimension: NSCollectionLayoutDimension.absolute(isPhone ? 280 : 250)
+            )
+            let itemCount = isPhone ? 1 : 3
+            let item = NSCollectionLayoutItem(layoutSize: size)
+            
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: size, subitem: item, count: itemCount)
+//            let group = NSCollectionLayoutGroup.horizontal(layoutSize: size, repeatingSubitem: item, count: itemCount)
+            
+            let section = NSCollectionLayoutSection(group: group)
+            section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+            section.interGroupSpacing = 10
+            /*
+            // Supplementary header view setup
+            let headerFooterSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .estimated(20)
+            )
+            let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+                layoutSize: headerFooterSize,
+                elementKind: UICollectionView.elementKindSectionHeader,
+                alignment: .top
+            )
+            section.boundarySupplementaryItems = [sectionHeader]
+            */
+            return section
+        })
+        return compositionalLayout
+    }
+     
+    
     func updateData(news: [NewsItem]) {
-        print("DEBUG: \(#function)")
 //        var snapshot = NSDiffableDataSourceSnapshot<Section, UInt>()
-        var snapshot = NSDiffableDataSourceSnapshot<Section, NewsItem>()
+//        var snapshot = NSDiffableDataSourceSnapshot<Section, NewsItem>()
+        var snapshot = Snapshot()
         snapshot.appendSections([.main])
 //        snapshot.appendItems(newsViewModel.getNewsIDs())
         snapshot.appendItems(news)
         dataSource.apply(snapshot, animatingDifferences: false)
-//            var snapshot = Snapshot()
-//            snapshot.appendSections([.main])
-//            snapshot.appendItems(cards)
-//            dataSource.apply(snapshot, animatingDifferences: true)
     }
     
     func createSubscription() {
-        print("DEBUG: \(#function)")
 //        let publisher = newsViewModel.getNewsPublisher()
 //        subscription = publisher
 //            .sink(receiveCompletion: { completion in
@@ -183,11 +205,11 @@ class NewsController: UIViewController {
 //        }
 //    }
     private func downloadNews() {
-        print("DEBUG: \(#function)")
         Task { [weak self] in
             do {
                 try await self?.newsViewModel.fetchNews()
             } catch {
+                // TODO: Show Alert
                 print("DEBUG: Error while fetching news: \(error.localizedDescription)")
             }
         }
@@ -229,8 +251,10 @@ extension NewsController {
     }
 }
 */
-extension NewsController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+
+//extension NewsController: UICollectionViewDelegate {
+extension NewsController {
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.cellForItem(at: indexPath) else { return }
         cell.alpha = 0
         UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: { [weak self] in

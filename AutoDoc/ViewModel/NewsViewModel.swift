@@ -110,7 +110,6 @@ final class NewsViewModel {
     }
 
     func getImage(for newsItem: NewsItem) async throws -> UIImage {
-        print("new func getting image")
 //        let image = try await fetchImage(withPath: newsItem.titleImageUrl)
         // Check if image exists in cache
         let imagePath = newsItem.titleImageUrl

@@ -8,22 +8,36 @@
 import UIKit
 
 class NewsItemCell: UICollectionViewCell {
-    static let reuseIdentifier = "news-cell-reuse-identifier"
+    static let reuseIdentifier = "NewsCellReuseIdentifier"
 
     let titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .preferredFont(forTextStyle: .title1)
-        label.textAlignment = .left
+        label.font = .systemFont(ofSize: 17.0, weight: .semibold)
+        label.textAlignment = .center
         label.numberOfLines = 0
         return label
     }()
 
-    let titleImageView: UIImageView = {
+    let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 5.0
         return imageView
+    }()
+
+    let shadowView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 5.0
+        view.layer.shadowOpacity = 0.3
+        view.layer.shadowOffset = .zero
+        view.layer.shadowRadius = 7.0
+        view.layer.masksToBounds = false
+        return view
     }()
 
     override init(frame: CGRect) {
@@ -36,53 +50,23 @@ class NewsItemCell: UICollectionViewCell {
     }
 
     private func configureUI() {
+        contentView.addSubview(shadowView)
+        contentView.addSubview(imageView)
         contentView.addSubview(titleLabel)
-        contentView.addSubview(titleImageView)
+        let padding: CGFloat = 8.0
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8.0),
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8.0),
-            contentView.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 8.0),
-            titleImageView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8.0),
-            titleImageView.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
-            titleImageView.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: titleImageView.bottomAnchor, constant: 8.0)
-            // TODO: Check
-//            titleImageView.widthAnchor
-//            titleImageView.heightAnchor
+            imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
+            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+            contentView.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: padding),
+            shadowView.topAnchor.constraint(equalTo: imageView.topAnchor),
+            shadowView.leadingAnchor.constraint(equalTo: imageView.leadingAnchor),
+            shadowView.trailingAnchor.constraint(equalTo: imageView.trailingAnchor),
+            shadowView.bottomAnchor.constraint(equalTo: imageView.bottomAnchor),
+            titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: padding),
+            titleLabel.leadingAnchor.constraint(equalTo: imageView.leadingAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: imageView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: padding),
+            titleLabel.heightAnchor.constraint(equalToConstant: 62.0)
         ])
-        // TODO: Delete
-        backgroundColor = .lightGray
     }
 }
-
-/**
- class TextCell: UICollectionViewCell {
-     let label = UILabel()
-     static let reuseIdentifier = "text-cell-reuse-identifier"
-
-     override init(frame: CGRect) {
-         super.init(frame: frame)
-         configure()
-     }
-     required init?(coder: NSCoder) {
-         fatalError("not implemnted")
-     }
-
- }
-
- extension TextCell {
-     func configure() {
-         label.translatesAutoresizingMaskIntoConstraints = false
-         label.adjustsFontForContentSizeCategory = true
-         contentView.addSubview(label)
-         label.font = UIFont.preferredFont(forTextStyle: .caption1)
-         let inset = CGFloat(10)
-         NSLayoutConstraint.activate([
-             label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: inset),
-             label.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -inset),
-             label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: inset),
-             label.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -inset)
-             ])
-     }
- }
- */
