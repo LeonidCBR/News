@@ -231,10 +231,16 @@ extension NewsController {
 */
 extension NewsController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let newsItem = dataSource.itemIdentifier(for: indexPath) else { return }
-        guard let newsUrl = URL(string: newsItem.fullUrl) else { return }
-        let newsVC = SFSafariViewController(url: newsUrl)
-        present(newsVC, animated: true)
+        guard let cell = collectionView.cellForItem(at: indexPath) else { return }
+        cell.alpha = 0
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: { [weak self] in
+            guard let self = self else { return }
+            cell.alpha = 1.0
+            guard let newsItem = self.dataSource.itemIdentifier(for: indexPath) else { return }
+            guard let newsUrl = URL(string: newsItem.fullUrl) else { return }
+            let newsVC = SFSafariViewController(url: newsUrl)
+            self.present(newsVC, animated: true)
+        })
     }
 }
 /*
