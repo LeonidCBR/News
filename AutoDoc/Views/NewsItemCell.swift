@@ -9,7 +9,10 @@ import UIKit
 
 class NewsItemCell: UICollectionViewCell {
     // MARK: - Properties
-    static let reuseIdentifier = "NewsCellReuseIdentifier"
+//    static let reuseIdentifier = "NewsCellReuseIdentifier"
+    static var reuseIdentifier: String {
+      return String(describing: NewsItemCell.self)
+    }
 
     let titleLabel: UILabel = {
         let label = UILabel()

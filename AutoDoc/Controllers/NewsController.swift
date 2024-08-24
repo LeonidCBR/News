@@ -11,13 +11,9 @@ import SafariServices
 
 @MainActor
 class NewsController: UICollectionViewController {
-    enum Section {
-        case main
-    }
-    
     // MARK: - Value Types
-    typealias DataSource = UICollectionViewDiffableDataSource<Section, NewsItem>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, NewsItem>
+    typealias DataSource = UICollectionViewDiffableDataSource<String, NewsItem>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<String, NewsItem>
 
     // MARK: - Properties
     let newsViewModel: NewsViewModel
@@ -61,6 +57,11 @@ class NewsController: UICollectionViewController {
     private func configureUI() {
         title = "Новости"
         view.backgroundColor = .white
+        collectionView.register(
+            SectionHeaderReusableView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: SectionHeaderReusableView.reuseIdentifier
+        )
     }
 
     private func makeDataSource() -> DataSource {
@@ -73,15 +74,22 @@ class NewsController: UICollectionViewController {
         let dataSource = DataSource(collectionView: collectionView) { collectionView, indexPath, newsItem -> UICollectionViewCell? in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: newsItem)
         }
+        dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
+          guard kind == UICollectionView.elementKindSectionHeader else {
+            return nil
+          }
+          let section = self.dataSource.snapshot().sectionIdentifiers[indexPath.section]
+          let view = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: SectionHeaderReusableView.reuseIdentifier,
+            for: indexPath) as? SectionHeaderReusableView
+          view?.titleLabel.text = section
+          return view
+        }
         return dataSource
     }
 
     static func makeLayout() -> UICollectionViewLayout {
-//        collectionView.register(
-//            SectionHeaderReusableView.self,
-//            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-//            withReuseIdentifier: SectionHeaderReusableView.reuseIdentifier
-//        )
         let compositionalLayout = UICollectionViewCompositionalLayout(sectionProvider: { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
             let isPhone = layoutEnvironment.traitCollection.userInterfaceIdiom == UIUserInterfaceIdiom.phone
             let size = NSCollectionLayoutSize(
@@ -95,16 +103,16 @@ class NewsController: UICollectionViewController {
             section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
             section.interGroupSpacing = 10
             // Supplementary header view setup
-//            let headerFooterSize = NSCollectionLayoutSize(
-//                widthDimension: .fractionalWidth(1.0),
-//                heightDimension: .estimated(20)
-//            )
-//            let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
-//                layoutSize: headerFooterSize,
-//                elementKind: UICollectionView.elementKindSectionHeader,
-//                alignment: .top
-//            )
-//            section.boundarySupplementaryItems = [sectionHeader]
+            let headerFooterSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .estimated(20)
+            )
+            let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+                layoutSize: headerFooterSize,
+                elementKind: UICollectionView.elementKindSectionHeader,
+                alignment: .top
+            )
+            section.boundarySupplementaryItems = [sectionHeader]
             return section
         })
         return compositionalLayout
@@ -112,15 +120,19 @@ class NewsController: UICollectionViewController {
 
     private func updateData(news: [NewsItem]) {
         var snapshot = Snapshot()
-        snapshot.appendSections([.main])
-        snapshot.appendItems(news)
-        dataSource.apply(snapshot, animatingDifferences: false)
+        let sections = Dictionary(grouping: news, by: \.categoryType)
+        snapshot.appendSections(sections.keys.sorted())
+        sections.forEach { (key: String, items: [NewsItem]) in
+            snapshot.appendItems(items, toSection: key)
+        }
+        dataSource.apply(snapshot, animatingDifferences: true)
     }
 
     private func createSubscription() {
         subscription = newsViewModel.$news
             .sink(receiveCompletion: { completion in
                 if case .failure(let err) = completion {
+                    // TODO: Show Alert
                     print("DEBUG: Retrieving data failed with error \(err)")
                 }
             }, receiveValue: { news in
