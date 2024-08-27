@@ -11,9 +11,13 @@ import SafariServices
 
 @MainActor
 class NewsController: UICollectionViewController {
+    enum Section: String {
+        case main = "Все новости"
+    }
+
     // MARK: - Value Types
-    typealias DataSource = UICollectionViewDiffableDataSource<String, NewsItem>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<String, NewsItem>
+    typealias DataSource = UICollectionViewDiffableDataSource<Section, NewsItem>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, NewsItem>
 
     // MARK: - Properties
     let newsViewModel: NewsViewModel
@@ -55,7 +59,6 @@ class NewsController: UICollectionViewController {
 
     // MARK: - Functions
     private func configureUI() {
-        title = "Новости"
         view.backgroundColor = .white
         collectionView.register(
             SectionHeaderReusableView.self,
@@ -71,20 +74,22 @@ class NewsController: UICollectionViewController {
                 cell?.imageView.image = try await self?.newsViewModel.getImage(for: newsItem)
             }
         }
+        
         let dataSource = DataSource(collectionView: collectionView) { collectionView, indexPath, newsItem -> UICollectionViewCell? in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: newsItem)
         }
         dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
-          guard kind == UICollectionView.elementKindSectionHeader else {
-            return nil
-          }
-          let section = self.dataSource.snapshot().sectionIdentifiers[indexPath.section]
-          let view = collectionView.dequeueReusableSupplementaryView(
-            ofKind: kind,
-            withReuseIdentifier: SectionHeaderReusableView.reuseIdentifier,
-            for: indexPath) as? SectionHeaderReusableView
-          view?.titleLabel.text = section
-          return view
+            guard kind == UICollectionView.elementKindSectionHeader else {
+                return nil
+            }
+            let section = self.dataSource.snapshot().sectionIdentifiers[indexPath.section]
+            let view = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: SectionHeaderReusableView.reuseIdentifier,
+                for: indexPath) as? SectionHeaderReusableView
+//            view?.titleLabel.text = section
+            view?.titleLabel.text = section.rawValue
+            return view
         }
         return dataSource
     }
@@ -120,11 +125,8 @@ class NewsController: UICollectionViewController {
 
     private func updateData(news: [NewsItem]) {
         var snapshot = Snapshot()
-        let sections = Dictionary(grouping: news, by: \.categoryType)
-        snapshot.appendSections(sections.keys.sorted())
-        sections.forEach { (key: String, items: [NewsItem]) in
-            snapshot.appendItems(items, toSection: key)
-        }
+        snapshot.appendSections([.main])
+        snapshot.appendItems(news)
         dataSource.apply(snapshot, animatingDifferences: true)
     }
 
@@ -143,14 +145,13 @@ class NewsController: UICollectionViewController {
     private func downloadNews() {
         Task { [weak self] in
             do {
-                try await self?.newsViewModel.fetchNews()
+                try await self?.newsViewModel.loadMoreNews()
             } catch {
                 // TODO: Show Alert
                 print("DEBUG: Error while fetching news: \(error.localizedDescription)")
             }
         }
     }
-
 }
 
 // MARK: - UICollectionViewDataSource Implementation
@@ -166,5 +167,16 @@ extension NewsController {
             let newsVC = SFSafariViewController(url: newsUrl)
             self.present(newsVC, animated: true)
         })
+    }
+}
+
+extension NewsController {
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let height = scrollView.frame.size.height
+        if offsetY > contentHeight - height * 1.5 {
+            downloadNews()
+        }
     }
 }

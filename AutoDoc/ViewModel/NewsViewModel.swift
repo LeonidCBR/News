@@ -9,9 +9,14 @@ import UIKit
 import Combine
 
 @MainActor
-final class NewsViewModel {
+final class NewsViewModel: ObservableObject {
     // MARK: - Properties
     @Published private(set) var news: [NewsItem] = []
+    private var isLoading: Bool = false
+    private var canLoadMorePages = true
+    private var currentPage = 1
+    private let countItemsPerPage = 15
+    private let urlString = "https://webapi.autodoc.ru/api/news/"
     private let networkProvider: NetworkProvider
     private let cacheImages = NSCache<NSString, UIImage>()
 
@@ -21,9 +26,16 @@ final class NewsViewModel {
     }
 
     // MARK: - Functions
-    func fetchNews() async throws {
-        let newsData = try await self.networkProvider.downloadData(withUrl: NewsFeed.url)
-        news = try decodeNewsData(newsData)
+    func loadMoreNews() async throws {
+        guard !isLoading && canLoadMorePages else { return }
+        isLoading = true
+        let newsUrl = URL(string: urlString + "\(currentPage)/\(countItemsPerPage)")!
+        let newsData = try await self.networkProvider.downloadData(withUrl: newsUrl)
+        let newItems = try decodeNewsData(newsData)
+        news.append(contentsOf: newItems)
+        isLoading = false
+        currentPage += 1
+        canLoadMorePages = newItems.count == countItemsPerPage
     }
 
     func decodeNewsData(_ newsData: Data) throws -> [NewsItem] {
