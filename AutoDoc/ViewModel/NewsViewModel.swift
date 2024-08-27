@@ -29,13 +29,18 @@ final class NewsViewModel: ObservableObject {
     func loadMoreNews() async throws {
         guard !isLoading && canLoadMorePages else { return }
         isLoading = true
-        let newsUrl = URL(string: urlString + "\(currentPage)/\(countItemsPerPage)")!
-        let newsData = try await self.networkProvider.downloadData(withUrl: newsUrl)
-        let newItems = try decodeNewsData(newsData)
-        news.append(contentsOf: newItems)
-        isLoading = false
-        currentPage += 1
-        canLoadMorePages = newItems.count == countItemsPerPage
+        do {
+            let newsUrl = URL(string: urlString + "\(currentPage)/\(countItemsPerPage)")!
+            let newsData = try await self.networkProvider.downloadData(withUrl: newsUrl)
+            let newItems = try decodeNewsData(newsData)
+            news.append(contentsOf: newItems)
+            currentPage += 1
+            canLoadMorePages = newItems.count == countItemsPerPage
+            isLoading = false
+        } catch {
+            isLoading = false
+            throw error
+        }
     }
 
     func decodeNewsData(_ newsData: Data) throws -> [NewsItem] {
